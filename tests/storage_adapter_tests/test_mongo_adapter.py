@@ -371,6 +371,29 @@ class MongoAdapterFilterTestCase(MongoAdapterTestCase):
 
         self.assertEqual(len(response.in_response_to), 2)
 
+    def test_filter_by_tags(self):
+        statement_a = Statement(text="Hello!")
+        statement_b = Statement(text="Hi everyone!")
+        statement_c = Statement(text="The air contains Oxygen.")
+
+        statement_a.add_tags(["greeting", "salutation"])
+        statement_b.add_tags(["greeting", "exclamation"])
+        statement_c.add_tags(["fact"])
+
+        self.adapter.update(statement_a)
+        self.adapter.update(statement_b)
+        self.adapter.update(statement_c)
+
+        results = self.adapter.filter(
+            tags__name__in=["greeting"]
+        )
+
+        results_text_list = [statement.text for statement in results]
+
+        self.assertEqual(len(results_text_list), 2)
+        self.assertIn("Hello!", results_text_list)
+        self.assertIn("Hi everyone!", results_text_list)
+
     def test_response_list_in_results(self):
         """
         If a statement with response values is found using

@@ -2,6 +2,7 @@ from django.test import TestCase
 from chatterbot.storage import DjangoStorageAdapter
 from chatterbot.ext.django_chatterbot.models import Statement as StatementModel
 from chatterbot.ext.django_chatterbot.models import Response as ResponseModel
+from chatterbot.ext.django_chatterbot.models import Tag as TagModel
 
 
 class DjangoAdapterTestCase(TestCase):
@@ -289,6 +290,23 @@ class DjangoAdapterFilterTestCase(DjangoAdapterTestCase):
         response = response.first()
 
         self.assertEqual(response.responses.count(), 2)
+
+    def test_filter_by_tags(self):
+        statement_a = StatementModel.objects.create(text="Hello!")
+        statement_b = StatementModel.objects.create(text="Hi everyone!")
+        statement_c = StatementModel.objects.create(text="The air contains Oxygen.")
+
+        statement_a.add_tags(["greeting", "salutation"])
+        statement_b.add_tags(["greeting", "exclamation"])
+        statement_c.add_tags(["fact"])
+
+        results = self.adapter.filter(
+            tags__name__in=["greeting"]
+        )
+
+        self.assertEqual(results.count(), 2)
+        self.assertEqual(results.filter(text="Hello!").count(), 1)
+        self.assertEqual(results.filter(text="Hi everyone!").count(), 1)
 
     def test_response_list_in_results(self):
         """
