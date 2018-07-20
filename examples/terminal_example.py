@@ -7,18 +7,19 @@ from chatterbot import ChatBot
 # logging.basicConfig(level=logging.INFO)
 
 # Create a new instance of a ChatBot
-bot = ChatBot(
-    "Terminal",
-    storage_adapter="chatterbot.storage.SQLStorageAdapter",
-    logic_adapters=[
-        "chatterbot.logic.MathematicalEvaluation",
-        "chatterbot.logic.TimeLogicAdapter",
-        "chatterbot.logic.BestMatch"
-    ],
-    input_adapter="chatterbot.input.TerminalAdapter",
-    output_adapter="chatterbot.output.TerminalAdapter",
-    database_uri="../database.db"
+chatbot = ChatBot(
+    'Ron Obvious',
+    trainer='chatterbot.trainers.ChatterBotCorpusTrainer'
 )
+
+# Train based on the english corpus
+chatbot.train("chatterbot.corpus.english")
+
+# Train based on english greetings corpus
+chatbot.train("chatterbot.corpus.english.greetings")
+
+# Train based on the english conversations corpus
+chatbot.train("chatterbot.corpus.english.conversations")
 
 print("Type something to begin...")
 
@@ -27,7 +28,7 @@ while True:
     try:
         # We pass None to this method because the parameter
         # is not used by the TerminalAdapter
-        bot_input = bot.get_response(None)
+        bot_input = chatbot.get_response(None)
 
     # Press ctrl-c or ctrl-d on the keyboard to exit
     except (KeyboardInterrupt, EOFError, SystemExit):
